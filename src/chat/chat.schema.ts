@@ -1,7 +1,4 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
-
-
 
 @Schema()
 export class chats{
@@ -13,4 +10,4 @@ export class chats{
 
 }
 
-export const chatSchema=SchemaFactory.createForClass(chatschema);
+export const chatSchema=SchemaFactory.createForClass(chats);

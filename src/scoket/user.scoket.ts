@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { SubscribeMessage } from "@nestjs/websockets";
 import { io, Socket } from "socket.io-client";
+import { ChatService } from "src/chat/chat.service";
 
 @Injectable()
 export class UserSocket{
@@ -8,13 +9,14 @@ export class UserSocket{
     public socket:Socket;
 
 
-    constructor(){
+    constructor(private chatService:ChatService){
         this.socket=io('http://localhost:3000')
     }
 
     @SubscribeMessage("onmessage")
     onMessage(payload:any){
         this.socket.on('onmessage',payload)
+        
         this.socket.emit('newmessage',(payload)=>{
             console.log(payload)
         })
