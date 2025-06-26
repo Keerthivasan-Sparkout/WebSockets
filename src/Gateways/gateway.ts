@@ -1,8 +1,10 @@
-import { UnauthorizedException } from "@nestjs/common"
+import { UnauthorizedException, UseGuards } from "@nestjs/common"
+import { Throttle } from '@nestjs/throttler'
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets"
 import { group } from "console"
 import { Server } from "Socket.io"
 import { Socket } from "socket.io-client"
+import { ThrottlerRateLimit } from "src/Auth/auth.throttler"
 import { ChatService } from "src/chat/chat.service"
 import { UserRoomService } from "src/room/user.room.service"
 import { User } from "src/User/user.schema"
@@ -41,7 +43,8 @@ export class MyGateWays implements OnGatewayInit, OnGatewayConnection, OnGateway
         let save_data = this.chatService.createChatActive(client.id, body)
         client.emit("replay chat", save_data)
     }
-
+    @Throttle({ default: { limit: 3, ttl: 60000 } })
+    @UseGuards(ThrottlerRateLimit)
     @SubscribeMessage("create room")
     async createRoom(@MessageBody() payload: { users: User, roomname: string }) {
         let newuser = await this.userservice.getUserByName(payload.users.user_name);
